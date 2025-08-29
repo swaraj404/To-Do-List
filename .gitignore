@@ -1,0 +1,29 @@
+# Compiled class files
+*.class
+target/
+
+# Log files
+*.log
+
+# Database files
+*.db
+*.sqlite
+
+# IDE files
+.vscode/
+.idea/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Database configuration with credentials
+ToDOList/src/main/resources/database.properties
+
+# Build artifacts
+ToDOList/target/
+
+# Temporary files
+*.tmp
+*.temp

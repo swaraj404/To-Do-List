@@ -1,86 +1,269 @@
 package com.swaraj.todolist.dataModel;
 
+import com.swaraj.todolist.services.DatabaseService;
+import com.swaraj.todolist.services.ExportImportService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Iterator;
+import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.function.Predicate;
 
+/**
+ * Enhanced ToDoData class with database persistence and advanced filtering
+ */
 public class ToDoData {
     private static ToDoData instance = new ToDoData();
-    private static String filename = "ToDoListItems.txt";
     private ObservableList<ToDoItem> toDoItems;
-    private DateTimeFormatter formatter;
-
-    private ToDoData(){
-        formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private FilteredList<ToDoItem> filteredItems;
+    private SortedList<ToDoItem> sortedItems;
+    private DatabaseService databaseService;
+    
+    // Filter predicates
+    private Predicate<ToDoItem> showAllItems = item -> true;
+    private Predicate<ToDoItem> showTodayItems = item -> 
+        !item.isCompleted() && item.getDeadline() != null && 
+        item.getDeadline().toLocalDate().equals(LocalDateTime.now().toLocalDate());
+    private Predicate<ToDoItem> showOverdueItems = item -> 
+        !item.isCompleted() && item.isOverdue();
+    private Predicate<ToDoItem> showCompletedItems = item -> item.isCompleted();
+    private Predicate<ToDoItem> showPendingItems = item -> !item.isCompleted();
+    
+    private ToDoData() {
+        databaseService = DatabaseService.getInstance();
+        toDoItems = FXCollections.observableArrayList(
+            // Add listeners for automatic property changes
+            item -> new javafx.beans.Observable[] {
+                item.shortDescriptionProperty(),
+                item.detailsProperty(),
+                item.deadlineProperty(),
+                item.categoryProperty(),
+                item.priorityProperty(),
+                item.completedProperty()
+            }
+        );
+        
+        // Set up filtered and sorted lists
+        filteredItems = new FilteredList<>(toDoItems, showAllItems);
+        sortedItems = new SortedList<>(filteredItems, getDefaultComparator());
     }
-
-    public ObservableList<ToDoItem> getToDoItems() {
-        return toDoItems;
-    }
-
+    
     public static ToDoData getInstance() {
         return instance;
     }
+    
+    /**
+     * Get the observable list of todo items
+     */
+    public ObservableList<ToDoItem> getToDoItems() {
+        return toDoItems;
+    }
+    
+    /**
+     * Get the filtered list
+     */
+    public FilteredList<ToDoItem> getFilteredItems() {
+        return filteredItems;
+    }
+    
+    /**
+     * Get the sorted list
+     */
+    public SortedList<ToDoItem> getSortedItems() {
+        return sortedItems;
+    }
+    
+    /**
+     * Add a new todo item
+     */
     public void addToDoItem(ToDoItem item) {
         toDoItems.add(item);
+        databaseService.saveTodoItem(item);
     }
-
-//    public void setToDoItems(List<ToDoItem> toDoItems) {
-//        this.toDoItems = toDoItems;
-//    }
-
-    public void loadToDoItems() throws IOException {
-        toDoItems = FXCollections.observableArrayList();
-        Path path = Paths.get(filename);
-        BufferedReader br = Files.newBufferedReader(path);
-        String input;
-        try {
-            while ((input = br.readLine()) != null){
-                String[] itemPieces = input.split("\t");
-                String shortDescription = itemPieces[0];
-                String details = itemPieces[1];
-                String dateString = itemPieces[2];
-
-                LocalDate date = LocalDate.parse(dateString,formatter);
-                ToDoItem toDoItem = new ToDoItem(shortDescription,details,date);
-                toDoItems.add(toDoItem);
-            }
-        }finally {
-            if (br != null){
-                br.close();
-            }
-        }
+    
+    /**
+     * Update an existing todo item
+     */
+    public void updateToDoItem(ToDoItem item) {
+        databaseService.saveTodoItem(item);
     }
-
-    public void storeToDoItems() throws IOException{
-        Path path = Paths.get(filename);
-        BufferedWriter bw = Files.newBufferedWriter(path);
-
-        try {
-            Iterator<ToDoItem> iter = toDoItems.iterator();
-            while(iter.hasNext()){
-                ToDoItem item = iter.next();
-                bw.write(String.format("%s\t%s\t%s",item.getShortDescription(),
-                        item.getDetails(),
-                        item.getDeadline().format(formatter)));
-                bw.newLine();
-            }
-        }finally {
-            if (bw != null){
-                bw.close();
-            }
-        }
-    }
+    
+    /**
+     * Delete a todo item
+     */
     public void deleteToDoItem(ToDoItem item) {
         toDoItems.remove(item);
+        databaseService.deleteTodoItem(item.getId());
+    }
+    
+    /**
+     * Load todo items from database
+     */
+    public void loadToDoItems() throws IOException {
+        try {
+            ObservableList<ToDoItem> loadedItems = databaseService.loadTodoItems();
+            toDoItems.clear();
+            toDoItems.addAll(loadedItems);
+        } catch (Exception e) {
+            throw new IOException("Failed to load todo items from database", e);
+        }
+    }
+    
+    /**
+     * Store todo items to database
+     */
+    public void storeToDoItems() throws IOException {
+        try {
+            // Items are automatically saved when added/updated, but we can force save all
+            for (ToDoItem item : toDoItems) {
+                databaseService.saveTodoItem(item);
+            }
+        } catch (Exception e) {
+            throw new IOException("Failed to store todo items to database", e);
+        }
+    }
+    
+    /**
+     * Search items by text
+     */
+    public void searchItems(String searchText) {
+        if (searchText == null || searchText.trim().isEmpty()) {
+            filteredItems.setPredicate(showAllItems);
+        } else {
+            String lowerCaseSearch = searchText.toLowerCase();
+            filteredItems.setPredicate(item -> 
+                item.getShortDescription().toLowerCase().contains(lowerCaseSearch) ||
+                item.getDetails().toLowerCase().contains(lowerCaseSearch)
+            );
+        }
+    }
+    
+    /**
+     * Filter by category
+     */
+    public void filterByCategory(ToDoItem.Category category) {
+        if (category == null) {
+            filteredItems.setPredicate(showAllItems);
+        } else {
+            filteredItems.setPredicate(item -> item.getCategory() == category);
+        }
+    }
+    
+    /**
+     * Filter by priority
+     */
+    public void filterByPriority(ToDoItem.Priority priority) {
+        if (priority == null) {
+            filteredItems.setPredicate(showAllItems);
+        } else {
+            filteredItems.setPredicate(item -> item.getPriority() == priority);
+        }
+    }
+    
+    /**
+     * Filter by completion status
+     */
+    public void filterByStatus(String status) {
+        switch (status.toLowerCase()) {
+            case "completed" -> filteredItems.setPredicate(showCompletedItems);
+            case "pending" -> filteredItems.setPredicate(showPendingItems);
+            case "overdue" -> filteredItems.setPredicate(showOverdueItems);
+            case "today" -> filteredItems.setPredicate(showTodayItems);
+            default -> filteredItems.setPredicate(showAllItems);
+        }
+    }
+    
+    /**
+     * Apply custom filter
+     */
+    public void applyFilter(Predicate<ToDoItem> filter) {
+        filteredItems.setPredicate(filter);
+    }
+    
+    /**
+     * Clear all filters
+     */
+    public void clearFilters() {
+        filteredItems.setPredicate(showAllItems);
+    }
+    
+    /**
+     * Sort by different criteria
+     */
+    public void sortBy(String criteria, boolean ascending) {
+        Comparator<ToDoItem> comparator = getComparator(criteria);
+        if (!ascending) {
+            comparator = comparator.reversed();
+        }
+        sortedItems.setComparator(comparator);
+    }
+    
+    /**
+     * Get comparator for sorting criteria
+     */
+    private Comparator<ToDoItem> getComparator(String criteria) {
+        return switch (criteria.toLowerCase()) {
+            case "deadline" -> Comparator.comparing(ToDoItem::getDeadline, 
+                Comparator.nullsLast(Comparator.naturalOrder()));
+            case "priority" -> Comparator.comparing(item -> item.getPriority().getValue(), 
+                Comparator.reverseOrder());
+            case "category" -> Comparator.comparing(item -> item.getCategory().getDisplayName());
+            case "created" -> Comparator.comparing(ToDoItem::getCreatedDate);
+            case "points" -> Comparator.comparing(ToDoItem::getPoints, Comparator.reverseOrder());
+            case "title" -> Comparator.comparing(ToDoItem::getShortDescription, 
+                String.CASE_INSENSITIVE_ORDER);
+            default -> getDefaultComparator();
+        };
+    }
+    
+    /**
+     * Get default comparator (uncompleted first, then by priority, then by deadline)
+     */
+    private Comparator<ToDoItem> getDefaultComparator() {
+        return Comparator
+            .comparing(ToDoItem::isCompleted) // Completed tasks last
+            .thenComparing(item -> item.getPriority().getValue(), Comparator.reverseOrder()) // High priority first
+            .thenComparing(ToDoItem::getDeadline, Comparator.nullsLast(Comparator.naturalOrder())); // Earliest deadline first
+    }
+    
+    /**
+     * Get statistics
+     */
+    public DatabaseService.TaskStatistics getStatistics() {
+        return databaseService.getTaskStatistics();
+    }
+    
+    /**
+     * Create backup
+     */
+    public void createBackup() {
+        ExportImportService.getInstance().createBackup(toDoItems);
+    }
+    
+    /**
+     * Mark task as completed and award points
+     */
+    public void completeTask(ToDoItem item) {
+        if (!item.isCompleted()) {
+            item.setCompleted(true);
+            updateToDoItem(item);
+            
+            // Award points through configuration service
+            com.swaraj.todolist.services.ConfigurationService config = 
+                com.swaraj.todolist.services.ConfigurationService.getInstance();
+            boolean leveledUp = config.addXP(item.getPoints());
+            
+            // Show notifications
+            com.swaraj.todolist.services.NotificationService notificationService = 
+                com.swaraj.todolist.services.NotificationService.getInstance();
+            notificationService.showTaskCompletedNotification(item);
+            
+            if (leveledUp) {
+                notificationService.showLevelUpNotification(config.getPlayerLevel());
+            }
+        }
     }
 }

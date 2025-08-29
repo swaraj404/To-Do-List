@@ -1,0 +1,13 @@
+#MySQL Database Configuration for To-Do List Application
+#Template file - Copy to database.properties and update with your credentials
+app.createTables=true
+app.initializeData=true
+db.driver=com.mysql.cj.jdbc.Driver
+db.password=YOUR_MYSQL_PASSWORD
+db.pool.connectionTimeout=30000
+db.pool.idleTimeout=600000
+db.pool.maxLifetime=1800000
+db.pool.maximumPoolSize=10
+db.pool.minimumIdle=2
+db.url=jdbc\\:mysql\\://localhost\\:3306/todolist_db?useSSL\\=false&serverTimezone\\=UTC&allowPublicKeyRetrieval\\=true
+db.username=YOUR_MYSQL_USERNAME

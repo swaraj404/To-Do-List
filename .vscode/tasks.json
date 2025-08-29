@@ -1,0 +1,15 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run To-Do List Application",
+			"type": "shell",
+			"command": "cd /home/swaraj/Projects/To-Do-List/ToDOList && mvn clean compile exec:java -Dexec.mainClass=\"com.swaraj.todolist.Main\"",
+			"group": "run",
+			"isBackground": true,
+			"problemMatcher": [
+				"$javac"
+			]
+		}
+	]
+}

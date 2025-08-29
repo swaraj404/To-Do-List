@@ -1,76 +1,202 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.VBox?>
-
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.TextArea?>
-<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-<?import javafx.scene.control.MenuBar?>
-<?import javafx.scene.control.Menu?>
-<?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.SeparatorMenuItem?>
-<?import javafx.scene.control.ToolBar?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.control.Tooltip?>
-<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.chart.PieChart?>
+
 <BorderPane fx:id="mainBorderPane" xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.swaraj.todolist.Controller">
+            fx:controller="com.swaraj.todolist.Controller"
+            prefWidth="1200" prefHeight="800">
+    
+    <!-- Top Menu and Toolbar -->
     <top>
         <VBox>
-        <MenuBar>
-            <Menu text="File">
-                <items>
-                    <MenuItem text="New..." onAction="#showNewItemDialog"/>
+            <!-- Menu Bar -->
+            <MenuBar>
+                <Menu text="File">
+                    <MenuItem text="New Task..." onAction="#showNewItemDialog" accelerator="Ctrl+N"/>
                     <SeparatorMenuItem/>
-                    <MenuItem text="Exit" onAction="#handleExit"/>
-                </items>
-            </Menu>
-        </MenuBar>
+                    <MenuItem text="Import Tasks..." onAction="#importTasks"/>
+                    <MenuItem text="Export Tasks..." onAction="#exportTasks"/>
+                    <MenuItem text="Create Backup" onAction="#createBackup"/>
+                    <SeparatorMenuItem/>
+                    <MenuItem text="Exit" onAction="#handleExit" accelerator="Ctrl+Q"/>
+                </Menu>
+                <Menu text="Edit">
+                    <MenuItem text="Edit Selected" onAction="#editSelectedItem" accelerator="Ctrl+E"/>
+                    <MenuItem text="Delete Selected" onAction="#deleteSelectedItem" accelerator="Delete"/>
+                    <MenuItem text="Duplicate Selected" onAction="#duplicateSelectedItem" accelerator="Ctrl+D"/>
+                    <SeparatorMenuItem/>
+                    <MenuItem text="Mark Complete" onAction="#toggleCompleteSelectedItem" accelerator="Space"/>
+                </Menu>
+                <Menu text="View">
+                    <MenuItem text="Refresh" onAction="#refreshAll" accelerator="F5"/>
+                    <MenuItem text="Clear Filters" onAction="#clearFilters" accelerator="Ctrl+R"/>
+                    <CheckMenuItem text="Show Statistics" fx:id="statsToggleMenuItem" onAction="#toggleStatistics"/>
+                </Menu>
+                <Menu text="Tools">
+                    <MenuItem text="Toggle Theme" onAction="#toggleTheme" accelerator="Ctrl+T"/>
+                </Menu>
+            </MenuBar>
+            
+            <!-- Main Toolbar -->
             <ToolBar>
-                <HBox>
-                    <Button onAction="#showNewItemDialog">
-                        <tooltip>
-                            <Tooltip text="Add a new item."/>
-                        </tooltip>
-                        <graphic>
-                            <ImageView>
-                                <Image url="@/toolbarButtonGraphics/general/New24.gif"/>
-                            </ImageView>
-                        </graphic>
-                    </Button>
-                    <ToggleButton fx:id="filterToggleButton" text="Today's Item" onAction="#handleFilterButton">
-
-                    </ToggleButton>
-                </HBox>
+                <Button text="New Task" onAction="#showNewItemDialog" styleClass="toolbar-button">
+                    <tooltip>
+                        <Tooltip text="Create a new task (Ctrl+N)"/>
+                    </tooltip>
+                </Button>
+                
+                <Separator orientation="VERTICAL"/>
+                
+                <!-- Search -->
+                <Label text="Search:"/>
+                <TextField fx:id="searchField" promptText="Search tasks..." prefWidth="200"/>
+                
+                <Separator orientation="VERTICAL"/>
+                
+                <!-- Filters -->
+                <Label text="Category:"/>
+                <ComboBox fx:id="categoryFilterComboBox" prefWidth="120"/>
+                
+                <Label text="Priority:"/>
+                <ComboBox fx:id="priorityFilterComboBox" prefWidth="100"/>
+                
+                <Label text="Status:"/>
+                <ComboBox fx:id="statusFilterComboBox" prefWidth="100"/>
+                
+                <Separator orientation="VERTICAL"/>
+                
+                <!-- Sort -->
+                <Label text="Sort by:"/>
+                <ComboBox fx:id="sortComboBox" prefWidth="120"/>
+                <CheckBox fx:id="sortAscendingCheckBox" text="Ascending"/>
+                
+                <Separator orientation="VERTICAL"/>
+                
+                <Button text="Clear Filters" onAction="#clearFilters"/>
+                <Button text="Refresh" onAction="#refreshAll"/>
+                
+                <!-- Right side buttons -->
+                <Region HBox.hgrow="ALWAYS"/>
+                
+                <ToggleButton fx:id="themeToggleButton" text="Dark Mode" onAction="#toggleTheme"/>
+                <ToggleButton fx:id="statsToggleButton" text="Statistics" onAction="#toggleStatistics"/>
             </ToolBar>
         </VBox>
     </top>
-    <left>
-        <ListView fx:id="todoListView" onKeyPressed="#handleKeyPressed">
-        </ListView>
-    </left>
+    
+    <!-- Main Content Area -->
     <center>
-        <VBox style="-fx-background-color: white">
-            <TextArea fx:id="itemDetailsTextArea" VBox.vgrow="ALWAYS" wrapText="true"/>
-            <HBox>
-                <Label text="Due:" style="-fx-background-color: white">
+        <SplitPane dividerPositions="0.3, 0.7" orientation="HORIZONTAL">
+            
+            <!-- Left Panel - Task List -->
+            <VBox>
+                <Label text="Tasks" styleClass="panel-header">
                     <font>
-                        <Font name="Times New Roman bold" size="20"/>
+                        <Font name="System Bold" size="14"/>
                     </font>
                 </Label>
-                <Label fx:id="deadlinelabel" style="-fx-background-color: white">
+                <ListView fx:id="todoListView" onKeyPressed="#handleKeyPressed" VBox.vgrow="ALWAYS"/>
+            </VBox>
+            
+            <!-- Center Panel - Task Details -->
+            <VBox spacing="10">
+                <padding>
+                    <Insets top="10" right="10" bottom="10" left="10"/>
+                </padding>
+                
+                <Label text="Task Details" styleClass="panel-header">
                     <font>
-                        <Font name="Times New Roman bold" size="20"/>
+                        <Font name="System Bold" size="14"/>
                     </font>
                 </Label>
-            </HBox>
-        </VBox>
+                
+                <!-- Task metadata -->
+                <GridPane hgap="10" vgap="5">
+                    <Label text="Due:" GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="label-bold"/>
+                    <Label fx:id="deadlineLabel" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                    
+                    <Label text="Category:" GridPane.rowIndex="1" GridPane.columnIndex="0" styleClass="label-bold"/>
+                    <Label fx:id="categoryLabel" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                    
+                    <Label text="Priority:" GridPane.rowIndex="2" GridPane.columnIndex="0" styleClass="label-bold"/>
+                    <Label fx:id="priorityLabel" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                    
+                    <Label text="Points:" GridPane.rowIndex="3" GridPane.columnIndex="0" styleClass="label-bold"/>
+                    <Label fx:id="pointsLabel" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                </GridPane>
+                
+                <Separator/>
+                
+                <!-- Task description -->
+                <Label text="Description:">
+                    <font>
+                        <Font name="System Bold" size="12"/>
+                    </font>
+                </Label>
+                <TextArea fx:id="itemDetailsTextArea" wrapText="true" editable="false" 
+                         VBox.vgrow="ALWAYS" styleClass="details-area"/>
+            </VBox>
+            
+            <!-- Right Panel - Statistics and Gamification -->
+            <VBox fx:id="rightPanel" spacing="10" visible="false">
+                <padding>
+                    <Insets top="10" right="10" bottom="10" left="10"/>
+                </padding>
+                
+                <!-- Gamification Section -->
+                <VBox spacing="5" styleClass="gamification-panel">
+                    <Label text="Progress" styleClass="panel-header">
+                        <font>
+                            <Font name="System Bold" size="14"/>
+                        </font>
+                    </Label>
+                    
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label fx:id="levelLabel" text="Level 1" styleClass="level-label"/>
+                        <Label fx:id="totalPointsLabel" text="Total Points: 0" styleClass="points-label"/>
+                    </HBox>
+                    
+                    <VBox spacing="3">
+                        <Label fx:id="xpLabel" text="0 / 100 XP" styleClass="xp-label"/>
+                        <ProgressBar fx:id="levelProgressBar" progress="0" prefWidth="200" styleClass="level-progress"/>
+                    </VBox>
+                </VBox>
+                
+                <Separator/>
+                
+                <!-- Statistics Section -->
+                <VBox fx:id="statisticsPanel" spacing="10" styleClass="statistics-panel">
+                    <Label text="Statistics" styleClass="panel-header">
+                        <font>
+                            <Font name="System Bold" size="14"/>
+                        </font>
+                    </Label>
+                    
+                    <PieChart fx:id="statisticsChart" prefHeight="200" prefWidth="250" 
+                             legendVisible="true" labelsVisible="false"/>
+                    
+                    <!-- Statistics details will be populated by controller -->
+                </VBox>
+            </VBox>
+            
+        </SplitPane>
     </center>
-
+    
+    <!-- Bottom Status Bar -->
+    <bottom>
+        <HBox spacing="10" alignment="CENTER_LEFT" styleClass="status-bar">
+            <padding>
+                <Insets top="5" right="10" bottom="5" left="10"/>
+            </padding>
+            
+            <Label text="Professional To-Do List Manager"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="statusLabel" text="Ready"/>
+        </HBox>
+    </bottom>
+    
 </BorderPane>

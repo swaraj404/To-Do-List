@@ -1,27 +1,108 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
 
-<DialogPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
+<DialogPane fx:id="mainDialogPane" xmlns:fx="http://javafx.com/fxml" 
             fx:controller="com.swaraj.todolist.DialogController"
-            prefHeight="400.0" prefWidth="600.0">
-    <headerText>
-        We could put instructions here.
-    </headerText>
-    <content>
-        <GridPane vgap="10" hgap="10">
-            <Label text="Short Description:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-            <TextField fx:id="shortDescriptionField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
-            <Label text="Details:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-            <TextArea fx:id="detailsArea" wrapText="true" GridPane.rowIndex="1" GridPane.columnIndex="1" />
-            <Label text="Deadline:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-            <DatePicker fx:id="deadlinePicker" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
-        </GridPane>
-    </content>
-
+            prefWidth="500" prefHeight="650">
+   <content>
+      <VBox spacing="15">
+         <padding>
+            <Insets top="20" right="20" bottom="20" left="20"/>
+         </padding>
+         
+         <!-- Title -->
+         <Label text="Create/Edit Task" styleClass="dialog-title">
+            <font>
+               <Font name="System Bold" size="16"/>
+            </font>
+         </Label>
+         
+         <Separator/>
+         
+         <!-- Main task form -->
+         <GridPane hgap="10" vgap="15">
+            <!-- Task description -->
+            <Label text="Task Description:" GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="field-label"/>
+            <TextArea fx:id="shortDescriptionTextArea" promptText="Enter task description..." 
+                     prefRowCount="2" wrapText="true" 
+                     GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+            
+            <!-- Detailed notes -->
+            <Label text="Details:" GridPane.rowIndex="1" GridPane.columnIndex="0" styleClass="field-label"/>
+            <TextArea fx:id="detailsTextArea" promptText="Additional details (optional)..." 
+                     prefRowCount="4" wrapText="true"
+                     GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+            
+            <!-- Category selection -->
+            <Label text="Category:" GridPane.rowIndex="2" GridPane.columnIndex="0" styleClass="field-label"/>
+            <ComboBox fx:id="categoryComboBox" prefWidth="200" 
+                     GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+            
+            <!-- Priority selection -->
+            <Label text="Priority:" GridPane.rowIndex="3" GridPane.columnIndex="0" styleClass="field-label"/>
+            <ComboBox fx:id="priorityComboBox" prefWidth="200"
+                     GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+            
+            <!-- Due date -->
+            <Label text="Due Date:" GridPane.rowIndex="4" GridPane.columnIndex="0" styleClass="field-label"/>
+            <DatePicker fx:id="deadlinePicker" prefWidth="200"
+                       GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+            
+            <!-- Due time -->
+            <Label text="Due Time:" GridPane.rowIndex="5" GridPane.columnIndex="0" styleClass="field-label"/>
+            <HBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="5">
+               <Spinner fx:id="hourSpinner" prefWidth="70" editable="true"/>
+               <Label text=":" alignment="CENTER"/>
+               <Spinner fx:id="minuteSpinner" prefWidth="70" editable="true"/>
+            </HBox>
+            
+            <columnConstraints>
+               <ColumnConstraints hgrow="NEVER" minWidth="120" prefWidth="120"/>
+               <ColumnConstraints hgrow="ALWAYS"/>
+            </columnConstraints>
+         </GridPane>
+         
+         <Separator/>
+         
+         <!-- Natural language input section -->
+         <VBox spacing="10">
+            <Label text="Quick Entry" styleClass="section-header">
+               <font>
+                  <Font name="System Bold" size="14"/>
+               </font>
+            </Label>
+            
+            <Label text="Try: 'Finish homework tomorrow at 6pm', 'Meeting next Monday morning', etc." 
+                   styleClass="help-text"/>
+            
+            <HBox spacing="10" alignment="CENTER_LEFT">
+               <TextField fx:id="naturalLanguageField" promptText="Type task with natural language..."
+                         prefWidth="300" HBox.hgrow="ALWAYS"/>
+               <Button text="Parse" onAction="#parseNaturalLanguage" styleClass="parse-button"/>
+               <Button text="Clear" onAction="#clearFields" styleClass="clear-button"/>
+            </HBox>
+         </VBox>
+         
+         <!-- Points preview -->
+         <VBox spacing="5">
+            <Label text="Task Points Preview:" styleClass="section-header">
+               <font>
+                  <Font name="System Bold" size="12"/>
+               </font>
+            </Label>
+            <Label fx:id="pointsPreviewLabel" text="Points will be calculated based on priority and category"
+                   styleClass="points-preview"/>
+         </VBox>
+         
+      </VBox>
+   </content>
+   
+   <buttonTypes>
+      <ButtonType fx:id="okButtonType" buttonData="OK_DONE" text="Save Task"/>
+      <ButtonType fx:id="cancelButtonType" buttonData="CANCEL_CLOSE" text="Cancel"/>
+   </buttonTypes>
 </DialogPane>

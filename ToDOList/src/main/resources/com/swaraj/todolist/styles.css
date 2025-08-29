@@ -1,0 +1,339 @@
+/* Professional To-Do List Styles */
+
+/* Root colors - Light theme */
+.root {
+    -fx-accent: #2196F3;
+    -fx-primary: #1976D2;
+    -fx-secondary: #FFC107;
+    -fx-success: #4CAF50;
+    -fx-warning: #FF9800;
+    -fx-danger: #F44336;
+    -fx-light: #F5F5F5;
+    -fx-dark: #212121;
+    -fx-muted: #757575;
+}
+
+/* Dark theme colors */
+.root.dark-theme {
+    -fx-base: #2b2b2b;
+    -fx-background: #3c3c3c;
+    -fx-control-inner-background: #3c3c3c;
+    -fx-text-fill: #ffffff;
+    -fx-accent: #64B5F6;
+    -fx-primary: #42A5F5;
+}
+
+/* Main window styling */
+#mainBorderPane {
+    -fx-background-color: -fx-background;
+}
+
+/* Panel headers */
+.panel-header {
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-primary;
+    -fx-padding: 5 0 5 0;
+}
+
+/* Toolbar styling */
+.toolbar-button {
+    -fx-padding: 8 12 8 12;
+    -fx-background-radius: 4;
+    -fx-background-color: -fx-accent;
+    -fx-text-fill: white;
+}
+
+.toolbar-button:hover {
+    -fx-background-color: derive(-fx-accent, -10%);
+}
+
+/* Status bar */
+.status-bar {
+    -fx-background-color: derive(-fx-background, -5%);
+    -fx-border-color: derive(-fx-background, -20%);
+    -fx-border-width: 1 0 0 0;
+}
+
+/* List cell styling */
+.todo-list-cell {
+    -fx-padding: 10;
+    -fx-border-width: 0 0 1 0;
+    -fx-border-color: derive(-fx-background, -10%);
+}
+
+.todo-list-cell:selected {
+    -fx-background-color: -fx-accent;
+    -fx-text-fill: white;
+}
+
+.todo-list-cell .title {
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+
+.todo-list-cell .subtitle {
+    -fx-font-size: 12px;
+    -fx-text-fill: -fx-muted;
+}
+
+.todo-list-cell .category-label {
+    -fx-background-radius: 10;
+    -fx-padding: 2 8 2 8;
+    -fx-font-size: 10px;
+    -fx-text-fill: white;
+}
+
+.todo-list-cell .priority-indicator {
+    -fx-min-width: 4;
+    -fx-max-width: 4;
+    -fx-background-radius: 2;
+}
+
+/* Priority colors */
+.priority-low {
+    -fx-background-color: #4CAF50;
+}
+
+.priority-medium {
+    -fx-background-color: #FF9800;
+}
+
+.priority-high {
+    -fx-background-color: #FF5722;
+}
+
+.priority-urgent {
+    -fx-background-color: #F44336;
+}
+
+/* Category colors */
+.category-work {
+    -fx-background-color: #2196F3;
+}
+
+.category-personal {
+    -fx-background-color: #9C27B0;
+}
+
+.category-health {
+    -fx-background-color: #4CAF50;
+}
+
+.category-education {
+    -fx-background-color: #FF9800;
+}
+
+.category-finance {
+    -fx-background-color: #795548;
+}
+
+.category-social {
+    -fx-background-color: #E91E63;
+}
+
+.category-shopping {
+    -fx-background-color: #009688;
+}
+
+.category-travel {
+    -fx-background-color: #3F51B5;
+}
+
+.category-other {
+    -fx-background-color: #607D8B;
+}
+
+/* Completed task styling */
+.completed-task {
+    -fx-opacity: 0.6;
+}
+
+.completed-task .title {
+    -fx-strikethrough: true;
+}
+
+/* Dialog styling */
+.dialog-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-primary;
+}
+
+.field-label {
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-fill;
+}
+
+.section-header {
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-primary;
+}
+
+.help-text {
+    -fx-font-size: 11px;
+    -fx-text-fill: -fx-muted;
+    -fx-font-style: italic;
+}
+
+.parse-button {
+    -fx-background-color: -fx-success;
+    -fx-text-fill: white;
+    -fx-background-radius: 4;
+}
+
+.clear-button {
+    -fx-background-color: -fx-warning;
+    -fx-text-fill: white;
+    -fx-background-radius: 4;
+}
+
+.points-preview {
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-success;
+}
+
+/* Details area */
+.details-area {
+    -fx-background-color: derive(-fx-background, 5%);
+    -fx-background-radius: 4;
+    -fx-border-color: derive(-fx-background, -10%);
+    -fx-border-radius: 4;
+    -fx-border-width: 1;
+}
+
+/* Gamification styling */
+.gamification-panel {
+    -fx-background-color: derive(-fx-background, 5%);
+    -fx-background-radius: 8;
+    -fx-padding: 15;
+    -fx-border-color: derive(-fx-background, -10%);
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+}
+
+.level-label {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-primary;
+}
+
+.points-label {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-secondary;
+}
+
+.xp-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: -fx-muted;
+}
+
+.level-progress {
+    -fx-accent: -fx-secondary;
+}
+
+/* Statistics panel */
+.statistics-panel {
+    -fx-background-color: derive(-fx-background, 5%);
+    -fx-background-radius: 8;
+    -fx-padding: 15;
+    -fx-border-color: derive(-fx-background, -10%);
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+}
+
+/* Overdue items */
+.overdue {
+    -fx-background-color: rgba(244, 67, 54, 0.1);
+    -fx-border-color: #F44336;
+    -fx-border-width: 0 0 0 4;
+}
+
+/* Due today items */
+.due-today {
+    -fx-background-color: rgba(255, 152, 0, 0.1);
+    -fx-border-color: #FF9800;
+    -fx-border-width: 0 0 0 4;
+}
+
+/* Search field highlighting */
+.search-highlight {
+    -fx-background-color: #FFEB3B;
+    -fx-background-radius: 2;
+}
+
+/* Context menu styling */
+.context-menu {
+    -fx-background-color: -fx-background;
+    -fx-background-radius: 4;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 2);
+}
+
+.context-menu .menu-item {
+    -fx-padding: 8 12 8 12;
+}
+
+.context-menu .menu-item:focused {
+    -fx-background-color: -fx-accent;
+    -fx-text-fill: white;
+}
+
+/* Toggle buttons */
+.toggle-button:selected {
+    -fx-background-color: -fx-accent;
+    -fx-text-fill: white;
+}
+
+/* Chart styling */
+.chart {
+    -fx-background-color: transparent;
+}
+
+.chart-title {
+    -fx-text-fill: -fx-text-fill;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.chart-legend {
+    -fx-background-color: transparent;
+}
+
+/* Notification styling */
+.notification {
+    -fx-background-color: derive(-fx-background, 10%);
+    -fx-background-radius: 8;
+    -fx-padding: 15;
+    -fx-border-color: -fx-accent;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 15, 0, 0, 3);
+}
+
+/* Scroll bar styling */
+.scroll-bar {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar .track {
+    -fx-background-color: derive(-fx-background, -5%);
+    -fx-background-radius: 8;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: derive(-fx-background, -20%);
+    -fx-background-radius: 8;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: derive(-fx-background, -30%);
+}
+
+/* Animation classes */
+.fade-in {
+    -fx-opacity: 0;
+}
+
+.slide-in {
+    -fx-translate-x: -100;
+}
